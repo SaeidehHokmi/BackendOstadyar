@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django_jalali.db import models as jmodels
 import jdatetime
 from rest_framework.exceptions import ValidationError
+from datetime import datetime  
 
 
 class Profile(models.Model):
@@ -121,7 +122,12 @@ class OfficeHours(models.Model):
     def __str__(self):
         return f"{self.teacher.username} - {self.day_of_week} ({self.start_time} to {self.end_time})"
 
-
+    def duration(self):
+        # محاسبه زمان حضور در یک روز به دقیقه
+        start = datetime.combine(self.date, self.start_time)  # ترکیب تاریخ و زمان شروع
+        end = datetime.combine(self.date, self.end_time)      # ترکیب تاریخ و زمان پایان
+        return (end - start).total_seconds() / 3600  # تبدیل زمان به ساعت
+    
 class ChatMessage(models.Model):
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
     receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_messages')

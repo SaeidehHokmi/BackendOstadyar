@@ -4,6 +4,7 @@ from .views import RegisterView, CourseViewSet, UserViewSet, CourseContentViewSe
     RegistrationCourseViewSet, OfficeHoursViewSet, ChatMessageViewSet, HomeworkDeadlineViewSet
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.urls import include, path
+from .views import RequestMeetingViewSet
 
 router = DefaultRouter()
 
@@ -17,6 +18,7 @@ router.register(r'registrations-course', RegistrationCourseViewSet)
 router.register(r'office-hours', OfficeHoursViewSet)
 router.register(r'chat-messages', ChatMessageViewSet)
 router.register(r'homework-deadlines', HomeworkDeadlineViewSet)
+router.register(r'request_meetings', RequestMeetingViewSet)
 
 urlpatterns = [
     path('register/', RegisterView.as_view(), name='register'),

@@ -5,6 +5,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework import status
+from django.db.models import Sum
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 from .filters import AssignmentFilter, CourseContentFilter, HomeworkUploadFilter, CourseGradeFilter, RegistrationCourseFilter, OfficeHoursFilter
 from .models import Profile, Course, CourseContent, Assignment, HomeworkUpload, CourseGrade, RegistrationCourse, OfficeHours, ChatMessage, HomeworkDeadline
@@ -150,7 +153,20 @@ class OfficeHoursViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(teacher=self.request.user)
+    
+    @action(detail=False, methods=['get'])
+    def total_hours(self, request):
+        start_date = request.query_params.get('start_date')
+        end_date = request.query_params.get('end_date')
 
+        if start_date and end_date:
+            office_hours = OfficeHours.objects.filter(
+                teacher=request.user,
+                date__range=[start_date, end_date]
+            )
+            total_duration = sum([oh.duration() for oh in office_hours])
+            return Response({"total_hours": total_duration})
+        return Response({"error": "Please provide start_date and end_date."}, status=400)
 
 class ChatMessageViewSet(viewsets.ModelViewSet):
     queryset = ChatMessage.objects.all()
